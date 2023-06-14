@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Shopping Cart</title>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css" rel="stylesheet" />
+   <link href="style.css" rel="stylesheet"> 
+                             <!-- This will must last line for button symbol -->
+</head>
+<body>
+
+   <section>
+      <div class="container">
+         <div class="cart">
+            <div class="col-md-12 col-lg-10 mx-auto">
+
+               <div class="cart-item">
+                  <div class="row">
+                     <div class="col-md-7 center-item">
+                        <img src="images/product-1.png" alt="">
+                        <h5>iPhone 11 128GB Black</h5>
+                     </div>
+
+                     <div class="col-md-5 center-item">
+                        <div class="input-group number-spinner">
+                           <button id="firstNegativeButton"  class="btn btn-default"><i class="fas fa-minus"></i></button>
+                           <input id="firstItemValue" type="text" class="form-control text-center first-Item" value="1">
+                           <button id="firstPositiveButton" class="btn btn-default"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <h5>$ <span id="phonePrice">1219</span></h5>
+                        <img src="images/remove.png" alt="" class="remove-item">
+                     </div>
+                  </div>
+               </div>
+
+               <div class="cart-item">
+                  <div class="row">
+                     <div class="col-md-7 center-item mx-auto">
+                        <img src="images/product-2.png" alt="">
+                        <h5>iPhone 11 Silicone Case - Black</h5>
+                     </div>
+
+                     <div class="col-md-5 center-item">
+                        <div class="input-group number-spinner">
+                           <button id="secondNegativeButton" class="btn btn-default"><i class="fas fa-minus"></i></button>
+                           <input id="secondItemValue" type="text" class="form-control text-center second-Item" value="1">
+                           <button id="secondPositiveButton" class="btn btn-default"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <h5>$ <span id="casingPrice">59</span></h5>
+                        <img src="images/remove.png" alt="" class="remove-item">
+                     </div>
+                  </div>
+               </div>
+
+               <div class="cart-item">
+                  <div class="row">
+
+                     <div class="col-md-8">
+                        <h5>Subtotal: </h5>
+                        <h5>Tax:</h5>
+                        <h5>Total:</h5>
+                     </div>
+
+                     <div class="col-md-4 status">
+                        <h5>$ <span id="subTotal">1,278</span></h5>
+                        <h5>$ <span id="tax">25</span></h5>
+                        <h5>$ <span id="total">1,303</span></h5>
+                     </div>
+                  </div>
+               </div>
+
+               <div class="col-md-12 pt-4 pb-4">
+                  <button type="button" class="btn btn-success check-out">Check Out</button>
+               </div>
+
+            </div>
+         </div>
+      </div>
+   </section>
+
+   <script>
+
+
+      // Adding or Subtract number of elements
+      function addSubtract(buttons, itemNumbers, addOrSub) {
+         const button = document.getElementById(buttons);
+         const inputValue = document.querySelector("input." + itemNumbers); // Value-1
+         button.addEventListener("click", function () {
+            const previousValue = parseFloat(inputValue.value);
+            let newValue;
+
+            // Adding or Subtracting Value
+            if (addOrSub === "add") {
+               newValue = previousValue + 1;
+            } 
+            else if (addOrSub === "sub") {
+               newValue = Math.max(previousValue - 1, 0);
+            }
+            if (newValue <= 40) {
+               inputValue.value = newValue;
+            }
+
+            // These three line for lowest no will be 0 and highest will be 40
+            const negativeButton = document.getElementById("negative" + itemNumbers);
+            negativeButton.disabled = newValue === 0;
+            positiveButton.disabled = newValue >= 40;
+
+            // Calculating total amount
+            calculateAmount("firstPositiveButton","phonePrice","firstItemValue");
+            calculateAmount("firstNegativeButton","phonePrice","firstItemValue");
+            calculateAmount("secondPositiveButton","casingPrice","secondItemValue");
+            calculateAmount("secondNegativeButton","casingPrice","secondItemValue");
+         });
+      }
+
+      addSubtract("firstPositiveButton","first-Item", "add");
+      addSubtract("firstNegativeButton","first-Item", "sub");
+
+      addSubtract("secondPositiveButton","second-Item", "add");
+      addSubtract("secondNegativeButton","second-Item", "sub");
+
+      // Calculating total amount
+      function calculateAmount(buttons, prices, itemValues) {
+         const button = document.getElementById(buttons);
+         button.addEventListener("click", function() {
+            const itemNumber = document.getElementById(itemValues).value;
+            const itemValue = parseFloat(itemNumber);
+            const price = document.getElementById(prices).innerText;
+
+            let firstItemTax = 15; // Tax included
+            let secondItemTax = 10; // Tax included
+            let productPrice;
+
+            // For first product
+            if (buttons === "firstPositiveButton" || buttons === "firstNegativeButton") {
+               productPrice = 1219;
+            } 
+            // For second product
+            else if (buttons === "secondPositiveButton" || buttons === "secondNegativeButton") {
+               productPrice = 59;
+            }
+
+            // Phone price update this 2 lines
+            const total = itemValue * productPrice;
+            document.getElementById(prices).innerText = total;
+
+            // Tax result update this 3 lines
+            const quantityFirst = parseFloat(document.getElementById("firstItemValue").value);
+            const quantitySecond = parseFloat(document.getElementById("secondItemValue").value);
+            const taxTotal = ((quantityFirst * firstItemTax) + (quantitySecond * secondItemTax));
+
+            // Subtotal price update this 3 lines
+            const phonePrice = parseFloat(document.getElementById("phonePrice").innerText);
+            const casingPrice = parseFloat(document.getElementById("casingPrice").innerText);
+            const subtotal = phonePrice + casingPrice;
+            
+            // Displaying by rewrite the value to that portion & .toFixed(2) is 0.00
+            document.getElementById("subTotal").innerText = subtotal.toFixed(2);
+            document.getElementById("tax").innerText = taxTotal.toFixed(2);
+            document.getElementById("total").innerText = (subtotal + taxTotal).toFixed(2);
+         });
+      }
+
+      calculateAmount("firstPositiveButton","phonePrice","firstItemValue");
+      calculateAmount("firstNegativeButton","phonePrice","firstItemValue");
+      calculateAmount("secondPositiveButton","casingPrice","secondItemValue");
+      calculateAmount("secondNegativeButton","casingPrice","secondItemValue");
+
+      
+
+      /* const button = document.getElementById("firstPositiveButton");
+         button.addEventListener("click", function(){
+            const itemNumber = document.getElementById("valueCapture").value;
+            const itemValue = parseFloat(itemNumber);
+            const price = document.getElementById("phonePrice").innerText;
+            const productPrice = 1219;
+            const total = itemValue * productPrice ;
+            document.getElementById("phonePrice").innerText = total ;
+         }); */
+
+
+   </script>
+</body>
+</html>
+
